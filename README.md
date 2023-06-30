@@ -166,6 +166,12 @@ class AppUser
 //... you can create the setter/getter if you want to. it's optional.
 }
 ```
+
+### Notice the validation converter for DateTime. Well, here is a full package for validations:
+
+```https://github.com/debascoguy/validation```
+You can easily validate any properties using the Attribute based validation package which already comes as required dependency in this ORM package.
+
 ## Repository
 ```
 <?php
