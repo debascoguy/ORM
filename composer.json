@@ -11,10 +11,10 @@
     ],
     "require": {
         "php": ">=8.2",
+        "emma/common": "^1.1.4",
 		"emma/dbal": "^1.0.0",
 		"emma/di": "^1.2.3",
-		"emma/validation": "^1.0.1",
-        "emma/common": "^1.1.3"
+		"emma/validation": "^1.0.1"
     },
     "autoload": {
         "psr-4": {
