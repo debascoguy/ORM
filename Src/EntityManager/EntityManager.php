@@ -126,11 +126,11 @@ class EntityManager implements EntityManagerInterface
     public function sum(string $column, array $criteria = [], ?int $limit = null, ?int $offset = null): int
     {
         $mysqlSelect = new Select($this->entityResolver->getEntity());
-        $mysqlSelect->setTableName($this->entityResolver->getEntityAttributeInstance()->getFullTableName())
+        $mysqlSelect->setCriteriaDataTypes($this->entityResolver->getDataTypes())
+            ->setTableName($this->entityResolver->getEntityAttributeInstance()->getFullTableName())
             ->setCriteria($criteria)
             ->setLimit($limit)
-            ->setOffset($offset)
-            ->setCriteriaDataTypes($this->entityResolver->getDataTypes());
+            ->setOffset($offset);
         return $mysqlSelect->sum($column);
     }
 
@@ -157,14 +157,14 @@ class EntityManager implements EntityManagerInterface
     ): mixed
     {
         $mysqlSelect = new Select($this->entityResolver->getEntity());
-        $mysqlSelect->setTableName($this->entityResolver->getEntityAttributeInstance()->getFullTableName())
+        $mysqlSelect->setFetchMode($fetchMode)
+            ->setCriteriaDataTypes($this->entityResolver->getDataTypes())
+            ->setTableName($this->entityResolver->getEntityAttributeInstance()->getFullTableName())
             ->setCriteria($criteria)
             ->setOrderBy($orderBy)
             ->setLimit($limit)
             ->setEndLimit($endLimit)
-            ->setOffset($offset)
-            ->setFetchMode($fetchMode)
-            ->setCriteriaDataTypes($this->entityResolver->getDataTypes());
+            ->setOffset($offset);
         return $mysqlSelect->execute();
     }
 

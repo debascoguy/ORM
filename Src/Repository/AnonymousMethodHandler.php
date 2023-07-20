@@ -50,31 +50,48 @@ class AnonymousMethodHandler
             return is_array($value) ? [WhereCondition::in($field, $value)] : [WhereCondition::eq($field, $value)];
         } else {
             $whereConditions = [];
-            $_2condition = [];
-            $count = 0;
-            $size = count($arguments);
-            for ($i = 0; $i < $size; $i++) {
+            $jointOperators = [];
+            $size = count($fields);
+            $valueOperators = array_keys(self::$VALUE_OPERATORS);
+            $nullOperators = array_keys(self::$NULL_OPERATORS);
+            for($i = 0; $i < $size; $i++) {
                 $field = $fields[$i];
-                $value = $arguments[$i];
-                $operand = is_array($value) ? "IN" : "=";
-                $concatOperand = $i > 0 ? strtoupper($operators[$i - 1]) : null;
-                $_2condition[] = WhereCondition::compose($field, $operand, $value);
-
-                $count++;
-                if ($count==2) {
-                    $whereConditions = WhereCompositeCondition::compose(
-                        $_2condition,
-                        $concatOperand
-                    );
-                    $_2condition = [];
-                    $count = 0;
+                $value = $arguments[$i] ?? null;
+                $operand =  $operators[$i] ?? null;
+                if (in_array($operand, self::$PRIMARY_OPERATORS)) {
+                    $whereConditions[] = WhereCondition::compose($field, $operand, $value);
+                } elseif (in_array($operand, $valueOperators)) {
+                    $whereConditions[] = WhereCondition::compose($field, self::$VALUE_OPERATORS[$operand], $value);
+                } elseif (in_array($operand, $nullOperators)) {
+                    $whereConditions[] = WhereCondition::compose($field, self::$NULL_OPERATORS[$operand], null);
+                } else {
+                    $whereConditions[] = WhereCondition::compose($field, is_array($value) ? "IN" : "=", $value);
                 }
-                if ($count==1 && $i == ($size-1) ) {
-                    $container = [$whereConditions, WhereCondition::compose($field, $operand, $value)];
-                    $whereConditions = WhereCompositeCondition::compose($container, $concatOperand);
+                if (in_array($operand, self::$JOINT_OPERATORS)) {
+                    $jointOperators[] = $operand;
                 }
             }
-            return reset($whereConditions);
+
+            //Concat / Joint Operands => [And, Or]
+            $size = count($jointOperators);
+            if ($size > 0) {
+                $compositeCondition = null;
+                $composed = false;
+                for($i = 0; $i < $size; $i++) {
+                    $concatOperand = $jointOperators[$i];
+                    $nextCondition = $composed ? 
+                                    [$compositeCondition, $whereConditions[$i+1]] : 
+                                    [$whereConditions[$i], $whereConditions[$i+1]];
+                    $compositeCondition = WhereCompositeCondition::compose(
+                        $nextCondition,
+                        strtoupper($concatOperand)
+                    );
+                    $composed = true;
+                }
+                return $compositeCondition;
+            } else {
+                return $whereConditions;
+            }
         }
     }
 

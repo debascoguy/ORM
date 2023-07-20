@@ -45,6 +45,19 @@ trait ParameterHelper
         $fieldNames = [];
         $regex = "/(" . $this->stringifyPropertyNames($entityPropertyNames) . ")/i";
         if (preg_match_all($regex, $parameterString, $fieldNames) !== false) {
+            $result = [];
+            $entityPropertyNamesLowerCase = array_map('strtolower', $entityPropertyNames);
+            foreach($fieldNames[0] as $propertyNames) {
+                if (false !== $columName = array_search(strtolower($propertyNames), $entityPropertyNamesLowerCase)) {
+                    $result[] = $columName;
+                }
+            }
+            return $result;
+        }
+
+        $columnNames = array_keys($entityPropertyNames);
+        $regex = "/(" . $this->stringifyPropertyNames($columnNames) . ")/i";
+        if (preg_match_all($regex, $parameterString, $fieldNames) !== false) {
             return $fieldNames[0];
         }
         return $fieldNames;
