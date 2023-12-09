@@ -160,11 +160,15 @@ class EntityManager implements EntityManagerInterface
         $mysqlSelect->setFetchMode($fetchMode)
             ->setCriteriaDataTypes($this->entityResolver->getDataTypes())
             ->setTableName($this->entityResolver->getEntityAttributeInstance()->getFullTableName())
-            ->setCriteria($criteria)
-            ->setOrderBy($orderBy)
             ->setLimit($limit)
             ->setEndLimit($endLimit)
             ->setOffset($offset);
+        if (!empty($criteria)) {
+            $mysqlSelect->setCriteria($criteria);
+        }
+        if (!empty($orderBy)) {
+            $mysqlSelect->setOrderBy($orderBy);
+        }  
         return $mysqlSelect->execute();
     }
 
@@ -250,14 +254,19 @@ class EntityManager implements EntityManagerInterface
     public function updateFields(array $fieldValues, WhereCompositeCondition|WhereCondition|array $criteria): mixed
     {
         $updatableFields = array_keys($this->entityResolver->getUpdatableKeyValue());
-        $attemptingFields = array_keys($fieldValues);
-        if (array_intersect($attemptingFields, $updatableFields) !== $attemptingFields) {
+        $fields = array_keys($fieldValues);
+        $values = array_values($fieldValues);
+        if (array_intersect($fields, $updatableFields) !== $fields) {
             throw new InvalidArgumentException("Invalid Fields: One or More Un-updatable field detected!");
         }
 
         $sqlQuery = new Query();
-        $sqlQuery->QB()->update($fieldValues)->from($this->entityResolver->getEntityAttributeInstance()->getFullTableName());
+        $sqlQuery->setParams($values);
+        $sqlQuery->QB()->update(array_combine($fields, array_fill(0, count($values), "?")))
+                        ->from($this->entityResolver->getEntityAttributeInstance()->getFullTableName());
+
         $sqlQuery = CriteriaHandler::handle($sqlQuery, $criteria, $this->entityResolver->getDataTypes());
+
         return $sqlQuery->execute();
     }
 
