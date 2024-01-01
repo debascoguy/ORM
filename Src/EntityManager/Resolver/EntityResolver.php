@@ -107,10 +107,11 @@ class EntityResolver implements EntityResolverInterface
             $this->propertyNames[$field->getPropertyName()] = $field->getPropertyName();
             $this->dataTypes[$columnName] = $field->getDataType();
             if (!$field->hasJoinTable()) {
-                if ($field->getColumn()->insertable) {
+                $column = $field->getColumn();
+                if (!is_null($column) && $column->insertable) {
                     $this->insertableKeyValuePair[$columnName] = null;
                 }
-                if ($field->getColumn()->updatable) {
+                if (!is_null($column) && $column->updatable) {
                     $this->updatableKeyValue[$columnName] = null;
                 }
                 if (!empty($id)) {
@@ -146,10 +147,11 @@ class EntityResolver implements EntityResolverInterface
 
             $id = $field->getId();
             if (!$field->hasJoinTable()) {
-                if ($field->getColumn()->insertable) {
+                $column = $field->getColumn();
+                if (!is_null($column) && $column->insertable) {
                     $this->insertableKeyValuePair[$columnName] = $field->getColumnValue();
                 }
-                if ($field->getColumn()->updatable) {
+                if (!is_null($column) && $column->updatable) {
                     $this->updatableKeyValue[$columnName] = $field->getColumnValue();
                 }
                 if (!empty($id)) {
