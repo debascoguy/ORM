@@ -11,7 +11,7 @@ class Connection
 {
     use Singleton;
 
-    protected PDOConnection $activeConnection;
+    protected ?PDOConnection $activeConnection = null;
 
     /**
      * @param ConnectionProperty|array $connectionDetails

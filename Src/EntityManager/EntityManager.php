@@ -24,7 +24,7 @@ class EntityManager implements EntityManagerInterface
     /**
      * @var PDOConnection|null
      */
-    protected ?PDOConnection $connection;
+    protected ?PDOConnection $connection = null;
 
     /**
      * @param EntityResolverInterface $entityResolver
