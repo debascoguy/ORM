@@ -39,7 +39,7 @@ trait RelationshipResolver
         foreach ($relationships as $relationship) {
             /** @var RelationshipType|JoinTable $relInstance */
             $relInstance = $relationship->newInstance();
-            $relationshipsInstances[basename($relInstance::class)] = $relInstance;
+            $relationshipsInstances[$this->getShortName($relInstance::class)] = $relInstance;
         }
 
         /** @var \ReflectionAttribute[]|array $relationships */
@@ -47,9 +47,15 @@ trait RelationshipResolver
         if (!empty($relationships)) {
             /** @var JoinColumn $relInstance */
             $relInstance = $relationships[0]->newInstance();
-            $relationshipsInstances[basename($relInstance::class)] = $relInstance;
+            $relationshipsInstances[$this->getShortName($relInstance::class)] = $relInstance;
         }
         $this->relationships = $relationshipsInstances;
         return $this->relationships;
+    }
+
+    public function getShortName(string $className) 
+    {
+        $temp = explode("\\", $className);
+        return $temp[count($temp) - 1];
     }
 }

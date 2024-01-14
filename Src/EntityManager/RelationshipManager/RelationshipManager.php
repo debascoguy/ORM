@@ -125,12 +125,16 @@ class RelationshipManager implements RelationshipManagerInterface
         );
 
         $data = $prepareRelationship->fetch();
+        
+        if (!empty($data)) {
+            $entityResolver = new EntityResolver($relationshipType->targetEntity);
+            $entityHydrator = new EntityHydrator($entityResolver);
+            $entityManager  = new self($entityResolver, $entityHydrator);
+            $entityManager->entityResolver->getEntityAttributeInstance()->setFetchAsArray($this->isFetchArray);
+            return $entityManager->findEntityRelationship($data, $isSingleResult ? 1 : null);
+        }
 
-        $entityResolver = new EntityResolver($relationshipType->targetEntity);
-        $entityHydrator = new EntityHydrator($entityResolver);
-        $entityManager  = new self($entityResolver, $entityHydrator);
-        $entityManager->entityResolver->getEntityAttributeInstance()->setFetchAsArray($this->isFetchArray);
-        return $entityManager->findEntityRelationship($data, $isSingleResult ? 1 : null);
+        return $data;     
     }
 
     /**

@@ -106,7 +106,7 @@ class EntityResolver implements EntityResolverInterface
             $columnName = $field->getColumnName();
             $this->propertyNames[$field->getPropertyName()] = $field->getPropertyName();
             $this->dataTypes[$columnName] = $field->getDataType();
-            if (!$field->hasJoinTable()) {
+            if (!$field->hasManyRelationships()) {
                 $column = $field->getColumn();
                 if (!is_null($column) && $column->insertable) {
                     $this->insertableKeyValuePair[$columnName] = null;
@@ -146,7 +146,8 @@ class EntityResolver implements EntityResolverInterface
             }
 
             $id = $field->getId();
-            if (!$field->hasJoinTable()) {
+            $this->dataTypes[$columnName] = $field->getDataType();
+            if (!$field->hasManyRelationships()) {
                 $column = $field->getColumn();
                 if (!is_null($column) && $column->insertable) {
                     $this->insertableKeyValuePair[$columnName] = $field->getColumnValue();

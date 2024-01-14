@@ -37,7 +37,6 @@ class PropertyResolver
         $propertyInfo->setRelationships($relationship);
         $propertyInfo->setColumn($this->getColumn($property))->setColumnName($this->getColumnName($property));
         $propertyInfo->setId($this->resolveIdentifiers($property));
-        $propertyInfo->setHasJoinTable(isset($relationship["JoinTable"]));
         $propertyInfo->setReflectionProperty($property);
         return $propertyInfo;
     }
@@ -49,21 +48,27 @@ class PropertyResolver
      */
     public function resolveEntityValue(PropertyInfo $propertyInfo, $entity): PropertyInfo
     {
-        if ($propertyInfo->hasJoinTable()) {
+        if ($propertyInfo->hasManyRelationships()) {
+            //TODO: resolve for children/parent CRUD persistence operations -  in future release
             return $propertyInfo;
         }
 
         $property = $propertyInfo->getReflectionProperty();
         $columnValue = $property->getValue($entity);
+        $columnValue = $this->resolveInput($property, $columnValue);
+        if ($columnValue == null && $property->hasDefaultValue()) {
+            $columnValue =  $property->getDefaultValue();
+        }
         if ($columnValue == null && !$propertyInfo->getColumn()?->nullable) {
             $className = get_class($entity);
             $columnName = $propertyInfo->getColumnName();
             throw new InvalidArgumentException("Null value Set For $className :: $columnName And it's not nullable!");
         }
-
-        $columnValue = $this->resolveInput($property, $columnValue);
         $columnValue = $this->validateProperty($property, $columnValue, $entity);
         $propertyInfo->setColumnValue($columnValue);
+        if ($columnValue != null) {
+            $propertyInfo->setDataType(gettype($columnValue));
+        }
         return $propertyInfo;
     }
 

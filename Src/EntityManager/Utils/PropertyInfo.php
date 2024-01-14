@@ -149,6 +149,19 @@ class PropertyInfo extends Property
         return $this;
     }
 
+    public function hasManyRelationships(): bool
+    {
+        $relationship = $this->getRelationships();
+        if (isset($relationship["JoinTable"]) 
+            || isset($relationship["OneToMany"]) 
+            || isset($relationship["ManyToOne"]) 
+            || isset($relationship["ManyToMany"])) {
+            //TODO: resolve for children/parent CRUD persistence operations -  in future release
+            return true;
+        }
+        return false;
+    }
+
     public function setReflectionProperty(ReflectionProperty $property): static
     {
         $this->register("REFLECTION_PROPERTY", $property);
@@ -163,21 +176,4 @@ class PropertyInfo extends Property
         return $this->get("REFLECTION_PROPERTY");
     }
 
-    /**
-     * @param bool $status
-     * @return $this
-     */
-    public function setHasJoinTable(bool $status): static
-    {
-        $this->register("HAS_JOIN_TABLE", $status);
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasJoinTable(): bool
-    {
-        return $this->get("HAS_JOIN_TABLE", false);
-    }
 }
