@@ -11,11 +11,12 @@ use Emma\ORM\EntityManager\Interfaces\EntityHydratorInterface;
 use Emma\ORM\EntityManager\Interfaces\EntityResolverInterface;
 use Emma\ORM\EntityManager\Interfaces\RelationshipManagerInterface;
 use Emma\ORM\EntityManager\Resolver\EntityResolver;
-
+use Emma\ORM\EntityManager\Utils\ClassBaseName;
 
 class RelationshipManager implements RelationshipManagerInterface
 {
-
+    use ClassBaseName;
+    
     private bool $isFetchArray = false;
 
     public function __construct(
@@ -84,7 +85,7 @@ class RelationshipManager implements RelationshipManagerInterface
                 RelationshipTypeHelper::findJoinColumn($entityRelationship),
                 RelationshipTypeHelper::findJoinTable($entityRelationship),
                 $row,
-                RelationshipTypeHelper::isSingleResult($limit, basename($relationshipType::class))
+                RelationshipTypeHelper::isSingleResult($limit, $this->baseName($relationshipType::class))
             );
 
             if ($this->isFetchArray) {

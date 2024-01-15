@@ -6,10 +6,13 @@ use Emma\ORM\Attributes\Relationships\JoinColumn;
 use Emma\ORM\Attributes\Relationships\JoinTable;
 use Emma\ORM\Attributes\Relationships\Relationship;
 use Emma\ORM\Attributes\Relationships\RelationshipType;
+use Emma\ORM\EntityManager\Utils\ClassBaseName;
 use ReflectionProperty;
 
 trait RelationshipResolver
 {
+    use ClassBaseName;
+
     /**
      * @var string|null
      */
@@ -39,7 +42,7 @@ trait RelationshipResolver
         foreach ($relationships as $relationship) {
             /** @var RelationshipType|JoinTable $relInstance */
             $relInstance = $relationship->newInstance();
-            $relationshipsInstances[$this->getShortName($relInstance::class)] = $relInstance;
+            $relationshipsInstances[$this->baseName($relInstance::class)] = $relInstance;
         }
 
         /** @var \ReflectionAttribute[]|array $relationships */
@@ -47,15 +50,10 @@ trait RelationshipResolver
         if (!empty($relationships)) {
             /** @var JoinColumn $relInstance */
             $relInstance = $relationships[0]->newInstance();
-            $relationshipsInstances[$this->getShortName($relInstance::class)] = $relInstance;
+            $relationshipsInstances[$this->baseName($relInstance::class)] = $relInstance;
         }
         $this->relationships = $relationshipsInstances;
         return $this->relationships;
     }
-
-    public function getShortName(string $className) 
-    {
-        $temp = explode("\\", $className);
-        return $temp[count($temp) - 1];
-    }
+    
 }

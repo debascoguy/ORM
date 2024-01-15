@@ -56,17 +56,17 @@ class PropertyResolver
         $property = $propertyInfo->getReflectionProperty();
         $columnValue = $property->getValue($entity);
         $columnValue = $this->resolveInput($property, $columnValue);
-        if ($columnValue == null && $property->hasDefaultValue()) {
-            $columnValue =  $property->getDefaultValue();
+        if ($columnValue === null && $property->hasDefaultValue()) {
+            $columnValue = $property->getDefaultValue();
         }
-        if ($columnValue == null && !$propertyInfo->getColumn()?->nullable) {
+        if ($columnValue === null && !$propertyInfo->getColumn()?->nullable) {
             $className = get_class($entity);
             $columnName = $propertyInfo->getColumnName();
             throw new InvalidArgumentException("Null value Set For $className :: $columnName And it's not nullable!");
         }
         $columnValue = $this->validateProperty($property, $columnValue, $entity);
         $propertyInfo->setColumnValue($columnValue);
-        if ($columnValue != null) {
+        if ($columnValue !== null) {
             $propertyInfo->setDataType(gettype($columnValue));
         }
         return $propertyInfo;
