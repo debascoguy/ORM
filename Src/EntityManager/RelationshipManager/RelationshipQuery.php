@@ -45,7 +45,7 @@ class RelationshipQuery
         protected bool $isSingleResult
     ) {
         if (!is_null($this->joinTable)) {
-            $this->criteria = $this->prepareJoinTableCriteria(
+            $this->criteria = $this->prepareJoinColumnOrJoinTableCriteria(
                 $this->joinTable->joinColumns,
                 $this->relationshipTableAlias
             );
@@ -60,8 +60,8 @@ class RelationshipQuery
                 $this->parentTableAlias
             );
         } else {
-            $this->criteria = $this->prepareJoinColumnCriteria(
-                [$this->joinColumn], $this->parentTableAlias
+            $this->criteria = $this->prepareJoinColumnOrJoinTableCriteria(
+                [$this->joinColumn], $this->targetEntityTableAlias
             );
         }
         if (empty($this->criteria)) {
@@ -75,10 +75,7 @@ class RelationshipQuery
      */
     public function getQuery(): Query
     {
-        if (!is_null($this->joinTable)) {
-            return $this->getJoinTableQuery();
-        }
-        return $this->getJoinColumnQuery();
+        return !is_null($this->joinTable) ? $this->getJoinTableQuery() : $this->getJoinColumnQuery();
     }
 
     /**
@@ -140,23 +137,7 @@ class RelationshipQuery
      * @param string $columnAlias
      * @return array
      */
-    private function prepareJoinColumnCriteria(array $joinColumns, string $columnAlias = ""): array
-    {
-        $criteria = [];
-        $columnAlias = !empty($columnAlias) ? $columnAlias."." : $columnAlias;
-        foreach($joinColumns as $joinColumn) {
-            $value = $joinColumn instanceof JoinColumnValue ? $joinColumn->value : $this->parentData[$joinColumn->name];
-            $criteria[$columnAlias.$joinColumn->referencedColumnName] = $value;
-        }
-        return $criteria;
-    }
-
-    /**
-     * @param array|JoinColumn[] $joinColumns
-     * @param string $columnAlias
-     * @return array
-     */
-    private function prepareJoinTableCriteria(array $joinColumns, string $columnAlias = ""): array
+    private function prepareJoinColumnOrJoinTableCriteria(array $joinColumns, string $columnAlias = ""): array
     {
         $criteria = [];
         $columnAlias = !empty($columnAlias) ? $columnAlias."." : $columnAlias;
