@@ -131,17 +131,6 @@ class AppUser
     protected bool $is_deleted = false;
 
     /**
-     * @var array
-     */
-    #[OneToMany(AppRole::class)]
-    #[JoinTable(
-        'app_users_roles',
-        [new JoinColumn('user_id', 'id')],
-        [new JoinColumn('role_id', 'id')],
-    )]
-    protected array $roles = [];
-
-    /**
      * @var AppDocument|null
      */
     #[OneToOne(AppDocument::class)]
@@ -155,6 +144,21 @@ class AppUser
     )]
     protected ?AppDocument $profileImage = null;
 
+    #[OneToOne(ClientAppUser::class)]
+    #[JoinColumn('app_user_id', 'id')]
+    protected ClientAppUser $masterClient = null;
+
+    #[OneToMany(ClientAppUser::class)]
+    #[JoinColumn('app_user_id', 'id')]
+    protected array $clients = [];
+
+    #[OneToMany(AppRole::class)]
+    #[JoinTable(
+        'app_users_roles',
+        [new JoinColumn('user_id', 'id')],
+        [new JoinColumn('role_id', 'id')],
+    )]
+    protected array $roles = [];
 
     /**
      * AppUser constructor
