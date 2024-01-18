@@ -48,7 +48,8 @@ trait ParameterHelper
             $result = [];
             $entityPropertyNamesLowerCase = array_map('strtolower', $entityPropertyNames);
             foreach($fieldNames[0] as $propertyNames) {
-                if (false !== $columName = array_search(strtolower($propertyNames), $entityPropertyNamesLowerCase)) {
+                $searchKey = StringManagement::camelCaseToUnderscore($propertyNames);
+                if (false !== $columName = array_search($searchKey, $entityPropertyNamesLowerCase)) {
                     $result[] = $columName;
                 }
             }
